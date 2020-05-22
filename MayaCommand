@@ -1,0 +1,37 @@
+import sys
+import maya.OpenMaya as OpenMaya
+import maya.OpenMayaMPx as OpenMayaMPx
+
+#kPluginCmdName 变量定义了command（命令）的名称，这样加载插件后使用这个名称来运行doIt中相应的效果 
+
+kPluginCmdName = "spHelloWorld"
+
+# 建立command类
+class scriptedCommand(OpenMayaMPx.MPxCommand):
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
+        
+    # doIt 函数决定了当command执行时做什么样的动作，这里就是简单的打印“Hello World”
+    def doIt(self,argList):
+        print "Hello World!"
+
+# command类建立好后需要输入给maya，当调用这个方法的时候就会告诉maya我们建立的command内容，
+def cmdCreator():
+    return OpenMayaMPx.asMPxPtr( scriptedCommand() )
+    
+# 定义 安装 script plug-in的方法
+def initializePlugin(mobject):
+    mplugin = OpenMayaMPx.MFnPlugin(mobject)
+    try:
+        mplugin.registerCommand( kPluginCmdName, cmdCreator )
+    except:
+        sys.stderr.write( "Failed to register command: %s\n" % kPluginCmdName )
+        raise
+
+# 定义 卸载 script plug-in的方法
+def uninitializePlugin(mobject):
+    mplugin = OpenMayaMPx.MFnPlugin(mobject)
+    try:
+        mplugin.deregisterCommand( kPluginCmdName )
+    except:
+        sys.stderr.write( "Failed to unregister command: %s\n" % kPluginCmdName )
